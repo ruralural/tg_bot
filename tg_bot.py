@@ -3,6 +3,8 @@ import logging
 import os
 import feedparser
 import yaml
+import json
+import urllib.request
 from random import randint
 
 
@@ -17,6 +19,7 @@ def get_config(config_filename=None):
 
 config = get_config()
 TELEGRAM_TOKEN = config['tokens']['telegram']
+weather_api =  config['tokens']['weather_api']
 
 
 updater = Updater(TELEGRAM_TOKEN)
@@ -31,7 +34,13 @@ def echo(bot, update):
     bot.send_message(chat_id=update.message.chat_id, text=update.message.text)
 
 def forecast(bot, update):
-    bot.send_message(chat_id=update.message.chat_id, text=reddit_feed)
+    with urllib.request.urlopen(weather_api) as url:
+        data = json.loads(url.read().decode())
+        current_state = data['weather'][0]['main']
+        current_temp = round(data['main']['temp'])
+    bot.send_message(chat_id=update.message.chat_id, text="The sky "
+                     "is {0} now and it's {1} degrees outside.".format(current_state,
+                                                                       current_temp))
 def feed(bot,update):
     reddit_feed = parser.entries[randint(0,10)]['link']
     bot.send_message(chat_id=update.message.chat_id, text=reddit_feed)
@@ -40,8 +49,6 @@ def feed(bot,update):
 start_handler = CommandHandler('start', start)
 dispatcher.add_handler(start_handler)
 
-#echo_handler= MessageHandler(Filters.text, echo)
-#dispatcher.add_handler(echo_handler)
 aww_handler = MessageHandler(Filters.regex(r'!aww'), feed)
 dispatcher.add_handler(aww_handler)
 
