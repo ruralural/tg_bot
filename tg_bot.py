@@ -19,7 +19,7 @@ def get_config(config_filename=None):
 
 config = get_config()
 TELEGRAM_TOKEN = config['tokens']['telegram']
-weather_api =  config['tokens']['weather_api']
+weather_api = config['tokens']['weather_api']
 
 
 updater = Updater(TELEGRAM_TOKEN)
@@ -28,7 +28,7 @@ parser = feedparser.parse('https://www.reddit.com/r/aww/top.rss?t=week')
 
 
 def start(bot, update):
-    bot.send_message(chat_id=update.message.chat_id, text="I'm a bot, please talk to me!")
+    bot.send_message(chat_id=update.message.chat_id, text="Hi! try out !aww and !weather")
 
 def echo(bot, update):
     bot.send_message(chat_id=update.message.chat_id, text=update.message.text)
@@ -39,7 +39,7 @@ def forecast(bot, update):
         current_state = data['weather'][0]['main']
         current_temp = round(data['main']['temp'])
     bot.send_message(chat_id=update.message.chat_id, text="The sky "
-                     "is {0} now and it's {1} degrees outside.".format(current_state,
+                     "is {0} now and it's {1} degrees outside.".format(current_state.lower(),
                                                                        current_temp))
 def feed(bot,update):
     reddit_feed = parser.entries[randint(0,10)]['link']
